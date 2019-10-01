@@ -9,11 +9,10 @@
 import UIKit
 import AudioToolbox
 import LocalAuthentication
-import Valet
 
 public enum ALConstants {
   static let nibName = "AppLocker"
-  static let kPincode = "pincode" // Key for saving pincode to keychain
+  static let kPincode = "pincode" // Key for saving pincode to UserDefaults
   static let kLocalizedReason = "Unlock with sensor" // Your message when sensors must be shown
   static let duration = 0.3 // Duration of indicator filling
   static let maxPinLength = 4
@@ -47,9 +46,9 @@ public class AppLocker: UIViewController {
   @IBOutlet weak var messageLabel: UILabel!
   @IBOutlet weak var submessageLabel: UILabel!
   @IBOutlet var pinIndicators: [Indicator]!
+  
   @IBOutlet weak var cancelButton: UIButton!
-
-  static let valet = Valet.valet(with: Identifier(nonEmpty: "Druidia")!, accessibility: .whenUnlockedThisDeviceOnly)  
+  
   // MARK: - Pincode
   private let context = LAContext()
   private var pin = "" // Entered pincode
@@ -57,11 +56,10 @@ public class AppLocker: UIViewController {
   private var isFirstCreationStep = true
   private var savedPin: String? {
     get {
-      return AppLocker.valet.string(forKey: ALConstants.kPincode)
+      return UserDefaults.standard.string(forKey: ALConstants.kPincode)
     }
     set {
-      guard let newValue = newValue else { return }
-      AppLocker.valet.set(string: newValue, forKey: ALConstants.kPincode)
+      UserDefaults.standard.set(newValue, forKey: ALConstants.kPincode)
     }
   }
   
@@ -143,7 +141,7 @@ public class AppLocker: UIViewController {
   }
   
   private func removePin() {
-    AppLocker.valet.removeObject(forKey: ALConstants.kPincode)
+    UserDefaults.standard.removeObject(forKey: ALConstants.kPincode)
     dismiss(animated: true, completion: nil)
   }
   
